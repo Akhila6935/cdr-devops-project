@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CDR Dashboard</title>
+
+<style>
+body { font-family: Arial; background:#0f172a; color:white; text-align:center; }
+h1 { background:#1e293b; padding:20px; color:#38bdf8; }
+button { padding:10px; margin:10px; cursor:pointer; }
+.card { background:#1e293b; padding:20px; margin:10px auto; width:300px; border-radius:10px; }
+table { margin:auto; width:80%; background:white; color:black; border-collapse:collapse; }
+th, td { padding:10px; border:1px solid #ccc; }
+</style>
+</head>
+
+<body>
+
+<h1>📡 CDR Analytics Dashboard</h1>
+
+<button onclick="loadAnalytics()">Analytics</button>
+<button onclick="loadCDR()">CDR Data</button>
+
+<div id="analytics"></div>
+<div id="cdrTable"></div>
+
+<script>
+async function loadAnalytics() {
+    let res = await fetch('http://127.0.0.1:5000/analytics');
+    let data = await res.json();
+
+    document.getElementById("analytics").innerHTML = `
+        <div class="card">
+            <h3>Total Cost</h3>
+            <p>₹ ${data.total_cost}</p>
+        </div>
+        <div class="card">
+            <h3>Avg Duration</h3>
+            <p>${data.avg_duration} sec</p>
+        </div>`;
+}
+
+async function loadCDR() {
+    let res = await fetch('http://127.0.0.1:5000/cdr');
+    let data = await res.json();
+
+    let table = `<table>
+    <tr><th>ID</th><th>Caller</th><th>Receiver</th><th>Duration</th><th>Type</th><th>Cost</th></tr>`;
+
+    data.forEach(row => {
+        table += `<tr>
+        <td>${row.id}</td>
+        <td>${row.caller}</td>
+        <td>${row.receiver}</td>
+        <td>${row.duration}</td>
+        <td>${row.call_type}</td>
+        <td>${row.cost}</td>
+        </tr>`;
+    });
+
+    table += `</table>`;
+    document.getElementById("cdrTable").innerHTML = table;
+}
+</script>
+
+</body>
+</html>
